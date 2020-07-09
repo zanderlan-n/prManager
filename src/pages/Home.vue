@@ -9,40 +9,45 @@
         }}</md-button>
       </md-field>
     </div>
-    <div v-for="repo in [backend, frontend, painel]" :key="repo">
-      <md-table v-model="repo.pullRequests.nodes" md-card>
-        <md-table-toolbar>
-          <h1 class="md-title">{{ repo.name }}</h1>
-        </md-table-toolbar>
-        <md-table-row slot="md-table-row" slot-scope="{ item }">
-          <md-table-cell md-label="Title" md-sort-by="Title" md-numeric>
-            {{ item.title }}
-          </md-table-cell>
-          <md-table-cell md-label="Author" md-sort-by="Author">
-            {{ item.author.login }}
-          </md-table-cell>
-          <md-table-cell md-label="Reviews Author" md-sort-by="Reviews Author">
-            <ul id="example-1" class="column-item">
-              <li
-                v-for="(item, index) in item.reviews.nodes"
-                :key="item.author.login + index"
-              >
-                {{ item.author.login }}
-              </li>
-            </ul>
-          </md-table-cell>
-          <md-table-cell md-label="State" md-sort-by="state">
-            <ul id="example-1" class="column-item">
-              <li v-for="item in item.reviews.nodes" :key="item.reviews">
-                {{ item.state }}
-              </li>
-            </ul>
-          </md-table-cell>
-          <md-table-cell md-label="URL" md-sort-by="url">
-            <a v-bind:href="item.url">{{ item.url }}</a>
-          </md-table-cell>
-        </md-table-row>
-      </md-table>
+    <div v-if="!skip">
+      <div v-for="repo in [backend, frontend, painel]" :key="repo">
+        <md-table v-model="repo.pullRequests.nodes" md-card>
+          <md-table-toolbar>
+            <h1 class="md-title">{{ repo.name }}</h1>
+          </md-table-toolbar>
+          <md-table-row slot="md-table-row" slot-scope="{ item }">
+            <md-table-cell md-label="Title" md-sort-by="Title" md-numeric>
+              {{ item.title }}
+            </md-table-cell>
+            <md-table-cell md-label="Author" md-sort-by="Author">
+              {{ item.author.login }}
+            </md-table-cell>
+            <md-table-cell
+              md-label="Reviews Author"
+              md-sort-by="Reviews Author"
+            >
+              <ul id="example-1" class="column-item">
+                <li
+                  v-for="(item, index) in item.reviews.nodes"
+                  :key="item.author.login + index"
+                >
+                  {{ item.author.login }}
+                </li>
+              </ul>
+            </md-table-cell>
+            <md-table-cell md-label="State" md-sort-by="state">
+              <ul id="example-1" class="column-item">
+                <li v-for="item in item.reviews.nodes" :key="item.reviews">
+                  {{ item.state }}
+                </li>
+              </ul>
+            </md-table-cell>
+            <md-table-cell md-label="URL" md-sort-by="url">
+              <a v-bind:href="item.url">{{ item.url }}</a>
+            </md-table-cell>
+          </md-table-row>
+        </md-table>
+      </div>
     </div>
   </div>
 </template>
@@ -121,25 +126,24 @@ const QUERY = gql`
   }
 `;
 
-const apollo = {
-  backend: {
-    query: QUERY,
-  },
-  frontend: {
-    query: QUERY,
-  },
-  painel: {
-    query: QUERY,
-  },
-};
-
 export default {
   name: 'Home',
   props: {
     msg: String,
   },
-  apollo,
+  apollo: {
+    backend: {
+      query: QUERY,
+    },
+    frontend: {
+      query: QUERY,
+    },
+    painel: {
+      query: QUERY,
+    },
+  },
   data: () => ({
+    skip: true,
     submitBtnText: 'Enviar',
     token: '',
     tableData: mockedData.data.repository.pullRequests.nodes,
@@ -147,9 +151,12 @@ export default {
   methods: {
     handleSendToken: function() {
       if (localStorage.token) {
-        this.$apollo.queries.user.refresh();
+        this.$apollo.queries.backend.refresh();
+        this.$apollo.queries.frontend.refresh();
+        this.$apollo.queries.painel.refresh();
       } else {
         this.submitBtnText = 'Refetch';
+        this.skip = false;
         tk.set(this.token);
       }
     },
@@ -158,6 +165,7 @@ export default {
     this.$nextTick(function() {
       if (localStorage.token) {
         this.submitBtnText = 'Refetch';
+        this.skip = false;
       } else {
         this.submitBtnText = 'Enviar';
       }
