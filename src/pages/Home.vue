@@ -13,14 +13,17 @@
         </md-table-cell>
         <md-table-cell md-label="Reviews Author" md-sort-by="Reviews Author">
           <ul id="example-1">
-            <li v-for="item in item.reviews.nodes" :key="item.author.login">
+            <li
+              v-for="(item, index) in item.reviews.nodes"
+              :key="item.author.login + index"
+            >
               {{ item.author.login }}
             </li>
           </ul>
         </md-table-cell>
         <md-table-cell md-label="State" md-sort-by="state">
           <ul id="example-1">
-            <li v-for="item in item.reviews.nodes" :key="item.reviews.nodes">
+            <li v-for="item in item.reviews.nodes" :key="item.reviews">
               {{ item.state }}
             </li>
           </ul>
@@ -34,10 +37,10 @@
 </template>
 
 <script>
-import mockedData from "./../assets/mockedData";
+import mockedData from './../assets/mockedData';
 console.log(mockedData);
 export default {
-  name: "Home",
+  name: 'Home',
   props: {
     msg: String,
   },
