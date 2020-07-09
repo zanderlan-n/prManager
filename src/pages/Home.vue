@@ -1,5 +1,17 @@
 <template>
   <div>
+    <p>
+      {{ user }}
+    </p>
+    <div>
+      <md-field class="input-wrapper">
+        <label>Token</label>
+        <md-input v-model="token"></md-input>
+        <md-button v-on:click="handleSendToken()" class="md-primary"
+          >Enviar</md-button
+        >
+      </md-field>
+    </div>
     <md-table v-model="tableData" md-card>
       <md-table-toolbar>
         <h1 class="md-title">Pull Requests</h1>
@@ -37,16 +49,43 @@
 </template>
 
 <script>
-import mockedData from './../assets/mockedData';
-console.log(mockedData);
+import mockedData from '../assets/mockedData';
+import tk from '../services/tokenManager';
+import gql from 'graphql-tag';
+
+const QUERY = gql`
+  query {
+    user(login: "lucasrmp") {
+      bio
+    }
+  }
+`;
+
+const apollo = {
+  user: {
+    query: QUERY,
+  },
+};
+
 export default {
   name: 'Home',
   props: {
     msg: String,
   },
+  apollo,
   data: () => ({
+    token: '',
     tableData: mockedData.data.repository.pullRequests.nodes,
   }),
+  methods: {
+    handleSendToken: function() {
+      console.log('sadsad', this.token);
+      console.log('sadsad', apollo);
+      tk.set(this.token);
+      this.$apollo.queries.user.refresh();
+      console.log('sadsad', apollo);
+    },
+  },
 };
 </script>
 
@@ -65,5 +104,10 @@ li {
 }
 a {
   color: #42b983;
+}
+.input-wrapper {
+  display: flex;
+  width: 50%;
+  margin: auto auto 30px;
 }
 </style>
