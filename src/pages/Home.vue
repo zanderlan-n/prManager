@@ -7,9 +7,9 @@
       <md-field class="input-wrapper">
         <label>Token</label>
         <md-input v-model="token"></md-input>
-        <md-button v-on:click="handleSendToken()" class="md-primary"
-          >Enviar</md-button
-        >
+        <md-button v-on:click="handleSendToken()" class="md-primary">{{
+          submitBtnText
+        }}</md-button>
       </md-field>
     </div>
     <md-table v-model="tableData" md-card>
@@ -74,17 +74,28 @@ export default {
   },
   apollo,
   data: () => ({
+    submitBtnText: 'Enviar',
     token: '',
     tableData: mockedData.data.repository.pullRequests.nodes,
   }),
   methods: {
     handleSendToken: function() {
-      console.log('sadsad', this.token);
-      console.log('sadsad', apollo);
-      tk.set(this.token);
-      this.$apollo.queries.user.refresh();
-      console.log('sadsad', apollo);
+      if (localStorage.token) {
+        this.$apollo.queries.user.refresh();
+      } else {
+        this.submitBtnText = 'Refetch';
+        tk.set(this.token);
+      }
     },
+  },
+  mounted: function() {
+    this.$nextTick(function() {
+      if (localStorage.token) {
+        this.submitBtnText = 'Refetch';
+      } else {
+        this.submitBtnText = 'Enviar';
+      }
+    });
   },
 };
 </script>
