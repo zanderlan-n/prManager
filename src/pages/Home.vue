@@ -10,52 +10,18 @@
       </md-field>
     </div>
     <div v-if="!skip">
-      <div v-for="repo in [backend, frontend, painel]" :key="repo">
-        <md-table v-model="repo.pullRequests.nodes" md-card>
-          <md-table-toolbar>
-            <h1 class="md-title">{{ repo.name }}</h1>
-          </md-table-toolbar>
-          <md-table-row slot="md-table-row" slot-scope="{ item }">
-            <md-table-cell md-label="Title" md-sort-by="Title" md-numeric>
-              {{ item.title }}
-            </md-table-cell>
-            <md-table-cell md-label="Author" md-sort-by="Author">
-              {{ item.author.login }}
-            </md-table-cell>
-            <md-table-cell
-              md-label="Reviews Author"
-              md-sort-by="Reviews Author"
-            >
-              <ul id="example-1" class="column-item">
-                <li
-                  v-for="(item, index) in item.reviews.nodes"
-                  :key="item.author.login + index"
-                >
-                  {{ item.author.login }}
-                </li>
-              </ul>
-            </md-table-cell>
-            <md-table-cell md-label="State" md-sort-by="state">
-              <ul id="example-1" class="column-item">
-                <li v-for="item in item.reviews.nodes" :key="item.reviews">
-                  {{ item.state }}
-                </li>
-              </ul>
-            </md-table-cell>
-            <md-table-cell md-label="URL" md-sort-by="url">
-              <a v-bind:href="item.url">{{ item.url }}</a>
-            </md-table-cell>
-          </md-table-row>
-        </md-table>
+      <div v-for="(repo, index) in [backend, frontend, painel]" :key="index">
+        <Table :repo="repo" :copyToClipboard="copyToClipboard" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import mockedData from '../assets/mockedData';
-import tk from '../services/tokenManager';
 import gql from 'graphql-tag';
+
+import tk from '../services/tokenManager';
+import Table from '../components/Table';
 
 const QUERY = gql`
   query {
@@ -128,9 +94,7 @@ const QUERY = gql`
 
 export default {
   name: 'Home',
-  props: {
-    msg: String,
-  },
+
   apollo: {
     backend: {
       query: QUERY,
@@ -142,12 +106,13 @@ export default {
       query: QUERY,
     },
   },
+
   data: () => ({
     skip: true,
     submitBtnText: 'Enviar',
     token: '',
-    tableData: mockedData.data.repository.pullRequests.nodes,
   }),
+
   methods: {
     handleSendToken: function() {
       if (localStorage.token) {
@@ -160,7 +125,17 @@ export default {
         tk.set(this.token);
       }
     },
+
+    copyToClipboard: function(name) {
+      const urls = this[name].pullRequests.nodes.reduce(
+        (acc, node) => `${acc}\n${node.url}`,
+        ''
+      );
+
+      navigator.clipboard.writeText(urls);
+    },
   },
+
   mounted: function() {
     this.$nextTick(function() {
       if (localStorage.token) {
@@ -170,6 +145,10 @@ export default {
         this.submitBtnText = 'Enviar';
       }
     });
+  },
+
+  components: {
+    Table,
   },
 };
 </script>

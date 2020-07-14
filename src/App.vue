@@ -4,15 +4,15 @@
       rel="stylesheet"
       href="//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons"
     />
-    <Home msg="Welcome to Your Vue.js App" />
+    <Home />
   </div>
 </template>
 
 <script>
-import Home from "./pages/Home.vue";
+import Home from './pages/Home.vue';
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
     Home,
   },
@@ -27,5 +27,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+body {
+  padding: 0 10%;
 }
 </style>
