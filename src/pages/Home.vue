@@ -22,6 +22,8 @@ import gql from 'graphql-tag';
 
 import tk from '../services/tokenManager';
 import Table from '../components/Table';
+const Discord = require('discord.js');
+const client = new Discord.Client(); // Create an instance of Discord#Client
 
 const QUERY = gql`
   query {
@@ -111,6 +113,7 @@ export default {
     skip: true,
     submitBtnText: 'Enviar',
     token: '',
+    discordToken: '',
   }),
 
   methods: {
@@ -125,7 +128,13 @@ export default {
         tk.set(this.token);
       }
     },
-
+    handleSendDiscordToken: function() {
+      if (localStorage.discordToken) {
+        client.login(localStorage.discordToken);
+      } else {
+        tk.setDiscordTnk(this.discordToken);
+      }
+    },
     copyToClipboard: function(name) {
       const urls = this[name].pullRequests.nodes.reduce(
         (acc, node) => `${acc}\n${node.url}`,
