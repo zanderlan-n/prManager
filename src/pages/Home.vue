@@ -85,6 +85,29 @@ const QUERY = gql`
         }
       }
     }
+    backendGoLegacy: repository(
+      owner: "BrainshipOrg"
+      name: "backend-go-legacy"
+    ) {
+      name
+      pullRequests(last: 10, states: [OPEN]) {
+        nodes {
+          title
+          author {
+            ...UserParts
+          }
+          url
+          reviews(last: 10) {
+            nodes {
+              author {
+                ...UserParts
+              }
+              state
+            }
+          }
+        }
+      }
+    }
   }
 
   fragment UserParts on User {
@@ -105,6 +128,9 @@ export default {
     painel: {
       query: QUERY,
     },
+    backendGoLegacy: {
+      query: QUERY,
+    },
   },
 
   data: () => ({
@@ -119,6 +145,7 @@ export default {
         this.$apollo.queries.backend.refresh();
         this.$apollo.queries.frontend.refresh();
         this.$apollo.queries.painel.refresh();
+        this.$apollo.queries.backendGoLegacy.refresh();
       } else {
         this.submitBtnText = 'Refetch';
         this.skip = false;
