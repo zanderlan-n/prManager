@@ -10,7 +10,10 @@
       </md-field>
     </div>
     <div v-if="!skip">
-      <div v-for="(repo, index) in [backend, frontend, painel]" :key="index">
+      <div
+        v-for="(repo, index) in [backend, frontend, painel, backendGoLegacy]"
+        :key="index"
+      >
         <Table :repo="repo" :copyToClipboard="copyToClipboard" />
       </div>
     </div>
