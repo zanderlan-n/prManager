@@ -150,7 +150,7 @@ export default {
         this.$apollo.queries.painel.refresh();
         this.$apollo.queries.backendGoLegacy.refresh();
       } else {
-        this.submitBtnText = 'Refetch';
+        this.submitBtnText = 'Refetch Teste';
         this.skip = false;
         tk.set(this.token);
       }
